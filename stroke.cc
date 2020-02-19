@@ -18,6 +18,7 @@
 #include "stroke.h"
 #include <cfloat>
 #include <cmath>
+#include <cstring>
 
 bool esNum(char c){
   return (c >= '0' && c <= '9') || c=='-' || c=='.';
@@ -34,6 +35,55 @@ Stroke::Stroke(int np) {
     pseq[i].x = pseq[i].y = -1;
 }
 
+char * getOneLine(char * str) {
+  int i = 0;
+  char * pos = str;
+
+  while (*pos != '\n') {
+      i++;
+      pos++;
+  }
+  char * line = new char[i+1];
+  strncpy(line, str, i);
+  line[i] = '\0';
+  //fprintf(stderr, "line is '%s'\n", line);
+  return line;
+}
+
+
+Stroke::Stroke(int np, char *& str) {
+  NP = np;
+  pseq = new Punto[NP];
+
+  rx = ry =  INT_MAX;
+  rs = rt = -INT_MAX;
+  //fprintf(stderr,"%d\n", NP);
+  int spacePos = 0;
+  int toBeCopied = 0;
+  for(int i=0; i<NP; i++) {
+    char * line = getOneLine(str);
+    str += strlen(line);
+    str++;
+    spacePos = 0;
+    while (*(line+spacePos) != ' ')
+        spacePos++;
+    char posX[10], posY[10];
+    strncpy(posX, line, spacePos);
+    posX[spacePos] = '\0';
+    toBeCopied = strlen(line) -spacePos;
+    strncpy(posY, line + spacePos + 1, toBeCopied);
+    posY[toBeCopied] = '\0';
+    pseq[i].x = atof(posX);
+    pseq[i].y = atof(posY);
+    //fprintf(stderr,"%f %f\n", pseq[i].x, pseq[i].y);
+    delete line;
+    if( pseq[i].x < rx ) rx = pseq[i].x;
+    if( pseq[i].y < ry ) ry = pseq[i].y;
+    if( pseq[i].x > rs ) rs = pseq[i].x;
+    if( pseq[i].y > rt ) rt = pseq[i].y;
+  }
+}
+/*
 Stroke::Stroke(int np, FILE *fd) {
   NP = np;
   pseq = new Punto[NP];
@@ -48,8 +98,7 @@ Stroke::Stroke(int np, FILE *fd) {
     if( pseq[i].y > rt ) rt = pseq[i].y;
   }
 }
-
-
+*/
 Stroke::Stroke(char *str, int inkml_id) {
   char aux[512];
   int iaux;

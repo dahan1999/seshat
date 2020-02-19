@@ -48,7 +48,8 @@ class Stroke{
   int cx, cy; //Centroid
   
   Stroke(int np);
-  Stroke(int np, FILE *fd);
+  Stroke(int np, char *& ss);
+  //Stroke(int np, FILE *fd);
   Stroke(FILE *fd);
   Stroke(char *str, int inkml_id);
   ~Stroke();

@@ -1,6 +1,6 @@
 CC=g++
-LINK=-lxerces-c -lm
-FLAGS = -O3 -Wno-unused-result #-I/path/to/boost/
+LINK=-lxerces-c -lm -shared -Wl,-soname,libseshat.so -o libseshat.so
+FLAGS = -O3 -Wno-unused-result -g -fPIC #-I/path/to/boost/
 
 OBJFEAS=symfeatures.o featureson.o online.o
 OBJMUESTRA=sample.o stroke.o

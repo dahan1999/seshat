@@ -63,6 +63,7 @@ Sample::Sample(char *in) {
   outinkml = outdot = NULL;
 
   //Read file extension
+  /*
   bool isInkML = true;
   const char auxext[7] = ".inkml";
   for(int i=strlen(in)-1, j=0; i>=0 && j<6; i--, j++)
@@ -75,7 +76,8 @@ Sample::Sample(char *in) {
     loadSCGInk( in );
   else
     loadInkML( in );
-  
+  */
+  loadSCGInk( in );
   ox = oy =  INT_MAX;
   os = ot = -INT_MAX;
   for(int i=0; i<nStrokes(); i++) {
@@ -106,7 +108,8 @@ void Sample::setSymRec( SymRec *sr ){
   SR = sr;
 }
 
-
+extern char * getOneLine(char * str);
+/*
 void Sample::loadSCGInk(char *str) {
   FILE *fd=fopen(str,"r");
   if( !fd ) {
@@ -132,6 +135,32 @@ void Sample::loadSCGInk(char *str) {
   }
 
   fclose(fd);
+}
+*/
+void Sample::loadSCGInk(char *str) {
+
+  if( 0 != strncmp(str, "SCG_INK",7)) {
+    fprintf(stderr, "\nError: input file format is not SCG_INK\n");
+    exit(-1);
+  }
+
+  int nstrokes, npuntos;
+  char * nextLine = str + 8;
+  char * line = getOneLine(nextLine);
+
+  nstrokes = atoi(line);
+  nextLine += strlen(line);
+  nextLine += 1;
+  delete line;
+  for(int i=0; i<nstrokes; i++) {
+    line = getOneLine(nextLine);
+    npuntos = atoi(line);
+    nextLine += strlen(line);
+    nextLine += 1;
+    delete line;
+
+    dataon.push_back(new Stroke(npuntos, nextLine));
+  }
 }
 
 void Sample::loadInkML(char *str) {
@@ -504,7 +533,7 @@ void Sample::setRegion(CellCYK *c, int *v, int size) {
 }
 
 void Sample::print() {
-  printf("Number of strokes: %d\n", nStrokes());
+  //printf("Number of strokes: %d\n", nStrokes());
   
   // for(int i=0; i<nStrokes(); i++) {
   //   printf("Stroke %d: (%d,%d)-(%d,%d)\n", i, dataon[i]->rx, dataon[i]->ry,

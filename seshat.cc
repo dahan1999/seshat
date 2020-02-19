@@ -38,6 +38,11 @@ void usage(char *str) {
   fprintf(stderr, "  -d graph:  save in 'graph' the description of the recognized tree (DOT format)\n");
 }
 
+extern "C" {
+    char * strokes2Math(char* strokes);
+}
+
+// -c Config/CONFIG -i SampleMathExps/exp.scgink -o out.inkml -r render.pgm -d out.dot
 int main(int argc, char *argv[]) {
 
   char input[MAXS], output[MAXS], config[MAXS], render[MAXS], dot[MAXS];
@@ -64,8 +69,28 @@ int main(int argc, char *argv[]) {
   //Because some of the feature extraction code uses std::cout/cin
   ios_base::sync_with_stdio(true);
 
+
+    FILE *file = fopen("SampleMathExps/exp2.scgink", "r");
+    char *code;
+    size_t n = 0;
+    int c;
+
+    if (file == NULL)
+        return -1; //could not open file
+
+    code = new char[3000];
+
+    while ((c = fgetc(file)) != EOF)
+    {
+        code[n++] = (char) c;
+    }
+
+    // don't forget to terminate with the null character
+    code[n] = '\0';        
+
   //Load sample and system configuration
-  Sample m( input );
+  //Sample m( input );
+  Sample m( code );
   meParser seshat(config);
 
   //Render image to file
@@ -83,6 +108,21 @@ int main(int argc, char *argv[]) {
 
   //Parse math expression
   seshat.parse_me(&m);
-  
+  printf("Most Likely Exp is %s\n", seshat.latexExp);
   return 0;
 }
+
+char * strokes2Math(char *strokes) {
+
+  char config[MAXS] = "Config/CONFIG";
+
+  //Load sample and system configuration
+  Sample m( strokes );
+  meParser seshat(config);
+
+  m.print();
+  //Parse math expression
+  seshat.parse_me(&m);
+  return seshat.latexExp;
+}
+

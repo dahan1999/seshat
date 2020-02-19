@@ -164,6 +164,78 @@ void ProductionB::printOut(Grammar *G, Hypothesis *H) {
   }
 }
 
+void ProductionB::generateLatex(Grammar *G, Hypothesis *H, char *& latexExp) {
+  if( outStr ) {
+
+    int pd1 = check_str(outStr, (char*)"$1");
+    int pd2 = check_str(outStr, (char*)"$2");
+    
+    int i=0;
+    int len = strlen(latexExp);
+    if( pd2 >= 0 && pd1 >= 0 && pd2 < pd1 ) {
+      while( outStr[i]!='$' || outStr[i+1] != '2') {
+	    latexExp[len] = outStr[i];
+        latexExp[len+1] = '\0';
+	    i++;
+      }
+      i+=2;
+      
+      if( H->hd->clase < 0 )
+	H->hd->prod->generateLatex( G, H->hd, latexExp );
+      else
+	strcat(latexExp, H->hd->pt->getTeX( H->hd->clase ) );
+      
+      while( outStr[i]!='$' || outStr[i+1] != '1') {
+      len = strlen(latexExp);
+	  latexExp[len] = outStr[i];
+      latexExp[len+1] = '\0';
+	i++;
+      }
+      i+=2;
+
+      if( H->hi->clase < 0 )
+	H->hi->prod->generateLatex( G, H->hi, latexExp );
+      else
+	strcat(latexExp, H->hi->pt->getTeX( H->hi->clase ) );
+    }
+    else {
+      if( pd1 >= 0 ) {
+	while( outStr[i]!='$' || outStr[i+1] != '1') {
+      len = strlen(latexExp);
+	  latexExp[len] = outStr[i];
+      latexExp[len+1] = '\0';
+	  i++;
+	}
+	i+=2;
+	
+	if( H->hi->clase < 0 )
+	  H->hi->prod->generateLatex( G, H->hi, latexExp );
+	else
+	  strcat(latexExp, H->hi->pt->getTeX( H->hi->clase ) );
+      }
+      if( pd2 >= 0 ) {
+	while( outStr[i]!='$' || outStr[i+1] != '2') {
+      len = strlen(latexExp);
+	  latexExp[len] = outStr[i];
+      latexExp[len+1] = '\0';
+	  i++;
+	}
+	i+=2;
+	
+	if( H->hd->clase < 0 )
+	  H->hd->prod->generateLatex( G, H->hd , latexExp);
+	else
+	  strcat(latexExp, H->hd->pt->getTeX( H->hd->clase ) );
+      }
+    }
+    while( outStr[i] ) {
+      len = strlen(latexExp);
+	  latexExp[len] = outStr[i];
+      latexExp[len+1] = '\0';
+      i++;
+    }
+  }
+}
 
 void ProductionB::setMerges(char c) {
   merge_cen = c;

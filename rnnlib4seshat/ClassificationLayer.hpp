@@ -176,7 +176,7 @@ struct BinaryClassificationLayer: public ClassificationLayer, public NeuronLayer
 	real_t set_error(int pt, int targetClass)
 	{
 		real_t targetProb = class_prob(pt, targetClass);
-		((View<real_t>&)outputErrors[pt])[0] = (targetClass ? -(1/targetProb) : (1/targetProb));
+		(static_cast<const View<real_t>&>(outputErrors[pt]))[0] = (targetClass ? -(1/targetProb) : (1/targetProb));
 		return log(targetProb);
 	}
 };

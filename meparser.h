@@ -65,6 +65,7 @@ class meParser{
   //Output formatting methods
   void print_symrec(Hypothesis *H);
   void print_latex(Hypothesis *H);
+  char * latexExp;
   void save_dot( Hypothesis *H, char *outfile );
 };
 

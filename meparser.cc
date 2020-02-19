@@ -214,7 +214,7 @@ void meParser::initCYKterms(Sample *M, TableCYK *tcyk, int N, int K) {
       
     int cmy, asc, des;
     
-    printf("Stroke %d:\n", i);
+    //printf("Stroke %d:\n", i);
       
     int clase[NB];
     float pr[NB];
@@ -265,14 +265,14 @@ void meParser::initCYKterms(Sample *M, TableCYK *tcyk, int N, int K) {
     }
     
     if( insertar ) {
-      
+      /*
       for(int j=0; j<K; j++) {
 	if( cd->noterm[j] ) {
 	  printf("%12s [%s] %g\n", sym_rec->strClase(cd->noterm[j]->clase),
 		 G->key2str(j), exp(cd->noterm[j]->pr) );
 	}
       }
-      
+      */
       //Add to parsing table (size=1)
       tcyk->add(1, cd, -1, G->esInit);
     }
@@ -346,11 +346,12 @@ void meParser::combineStrokes(Sample *M, TableCYK *tcyk, LogSpace **LSP, int N) 
 	M->setRegion(cd, &stks_list);
 	
 	//Print hypothesis information
+    /*
 	printf("Multi-stroke (%d) hypothesis: {", size);
 	for(list<int>::iterator it=stks_list.begin(); it!=stks_list.end(); it++)
 	  printf(" %d", *it);
 	printf(" }\n");
-	
+	*/
 	float seg_prob = segmentation->prob(cd,M);
 	
 	cmy = sym_rec->clasificar(M, &stks_list, NB, clase, pr, &asc, &des);
@@ -396,13 +397,14 @@ void meParser::combineStrokes(Sample *M, TableCYK *tcyk, LogSpace **LSP, int N) 
 	}
 	
 	if( insertar ) {
-
+        /*
 	  for(int j=0; j<cd->nnt; j++) {
 	    if( cd->noterm[j] ) {
 	      printf("%12s [%s] %g\n", sym_rec->strClase(cd->noterm[j]->clase),
 		     G->key2str(j), exp(cd->noterm[j]->pr));
 	    }
 	  }
+       */
 	  tcyk->add(size, cd, -1, G->esInit);
 
 	}
@@ -512,7 +514,7 @@ void meParser::parse_me(Sample *M) {
   //Cocke-Younger-Kasami (CYK) algorithm for 2D-SCFG
   TableCYK tcyk( N, K );
 
-  printf("CYK table initialization:\n");
+  //printf("CYK table initialization:\n");
   initCYKterms(M, &tcyk, N, K);
 
   //Compute distances and visibility among strokes
@@ -529,8 +531,8 @@ void meParser::parse_me(Sample *M) {
   //Init the parsing table with several multi-stroke symbol segmentation hypotheses
   combineStrokes(M, &tcyk, logspace, N);
   
-  printf("\nCYK parsing algorithm\n");
-  printf("Size 1: Generated %d\n", tcyk.size(1));
+  //printf("\nCYK parsing algorithm\n");
+  //printf("Size 1: Generated %d\n", tcyk.size(1));
   
   //CYK algorithm main loop
   for(int talla=2; talla<=N; talla++) {
@@ -888,7 +890,7 @@ void meParser::parse_me(Sample *M) {
       logspace[talla] = new LogSpace(tcyk.get(talla), tcyk.size(talla), M->RX, M->RY);
     }
 
-    printf("Size %d: Generated %d\n", talla, tcyk.size(talla));
+    //printf("Size %d: Generated %d\n", talla, tcyk.size(talla));
 
 #ifdef VERBOSE
     for(CellCYK *cp=tcyk.get(talla); cp; cp=cp->sig) {
@@ -916,6 +918,7 @@ void meParser::parse_me(Sample *M) {
     exit(1);
   }
 
+/*
   printf("\nMost Likely Hypothesis (%d strokes)\n\n", mlh->parent->talla);
 
   printf("Math Symbols:\n");
@@ -923,7 +926,17 @@ void meParser::parse_me(Sample *M) {
   printf("\n");
 
   printf("LaTeX:\n");
+
   print_latex( mlh );
+*/
+  latexExp = new char[100];
+  latexExp[0] = '\0';
+  if( !mlh->pt ) {
+    mlh->prod->generateLatex( G, mlh, latexExp );
+  } else {
+    string clatex = mlh->pt->getTeX( mlh->clase );
+    strcpy(latexExp,clatex.c_str());
+  }
 
   //Save InkML file of the recognized expression
   M->printInkML( G, mlh );
@@ -964,7 +977,6 @@ void meParser::print_latex(Hypothesis *H) {
   }
   printf("\n");
 }
-
 
 void meParser::save_dot( Hypothesis *H, char *outfile ) {
   FILE *fd=fopen(outfile, "w");

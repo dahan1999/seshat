@@ -45,6 +45,7 @@ class ProductionB{
 
   float solape(Hypothesis *a, Hypothesis *b);
   void printOut(Grammar *G, Hypothesis *H);
+  void generateLatex(Grammar *G, Hypothesis *H, char *& latexExp);
   void setMerges(char c);
   void mergeRegions(Hypothesis *a, Hypothesis *b, Hypothesis *s);
   bool check_out();
